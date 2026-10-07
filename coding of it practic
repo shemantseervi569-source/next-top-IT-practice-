@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Code 30 - IT Practice Hub</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+            --success: #16a34a;
+            --error: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #fff;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Quiz Box */
+        .quiz-container {
+            margin-top: 20px;
+        }
+
+        .question-card {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .options li {
+            background: white;
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .options li:hover {
+            background: #e2e8f0;
+        }
+
+        .options li.correct {
+            background-color: #dcfce7;
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .options li.wrong {
+            background-color: #fee2e2;
+            border-color: var(--error);
+            color: var(--error);
+            font-weight: bold;
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Super Code 30 Practice Hub</h1>
+        <p>IT Subject Practice Questions</p>
+    </header>
+
+    <!-- Selection Form -->
+    <div id="selection-screen">
+        <div class="form-group">
+            <label for="grade-select">Select Grade:</label>
+            <select id="grade-select" onchange="updateChapters()">
+                <option value="">-- Choose Grade --</option>
+                <option value="grade9">Grade 9 (Super Code 30)</option>
+                <option value="grade10">Grade 10 (Super Code 30)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="chapter-select">Select Chapter:</label>
+            <select id="chapter-select" disabled>
+                <option value="">-- First Choose Grade --</option>
+            </select>
+        </div>
+
+        <button class="btn" onclick="startQuiz()">Start Practice</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="hidden">
+        <div id="quiz-content"></div>
+        <button id="next-btn" class="btn hidden" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="hidden">
+        <div class="result-box">
+            <h2>Practice Completed!</h2>
+            <p class="score-text" id="final-score"></p>
+            <button class="btn" onclick="restartQuiz()">Choose Another Chapter</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Question Database based on Super Code 30 Book Structure
+    const questionsDatabase = {
+        grade9: {
+            "ch1": {
+                name: "Chapter 1: Basics of Information Technology",
+                questions: [
+                    {
+                        question: "Which component is considered the brain of the computer?",
+                        options: ["RAM", "CPU", "Hard Disk", "Monitor"],
+                        answer: 1
+                    },
+                    {
+                        question: "Which type of memory is volatile?",
+                        options: ["ROM", "SSD", "RAM", "Hard Disk"],
+                        answer: 2
+                    }
+                ]
+            },
+            "ch2": {
+                name: "Chapter 2: Cyber Safety & Ethics",
+                questions: [
+                    {
+                        question: "What is a strong password requirement?",
+                        options: ["Only numbers", "Your nickname", "Combination of letters, numbers, and symbols", "Your birthdate"],
+                        answer: 2
+                    },
+                    {
+                        question: "Phishing attempts are commonly delivered via:",
+                        options: ["Offline books", "Emails and SMS", "Printer paper", "Bluetooth devices"],
+                        answer: 1
+                    }
+                ]
+            }
+        },
+        grade10: {
+            "ch1": {
+                name: "Chapter 1: Digital Documentation & Formatting",
+                questions: [
+                    {
+                        question: "Which shortcut key is used to paste copied text?",
+                        options: ["Ctrl + C", "Ctrl + X", "Ctrl + V", "Ctrl + P"],
+                        answer: 2
+                    },
+                    {
+                        question: "Which feature allows sending personalized letters to multiple people?",
+                        options: ["Mail Merge", "Macro", "Header & Footer", "Styles"],
+                        answer: 0
+                    }
+                ]
+            },
+            "ch2": {
+                name: "Chapter 2: Electronic Spreadsheet & Analysis",
+                questions: [
+                    {
+                        question: "In spreadsheets, every formula must begin with which sign?",
+                        options: ["+", "@", "=", "#"],
+                        answer: 2
+                    },
+                    {
+                        question: "What function is used to add values in a range of cells?",
+                        options: ["COUNT()", "SUM()", "TOTAL()", "ADD()"],
+                        answer: 1
+                    }
+                ]
+            }
+        }
+    };
+
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function updateChapters() {
+        const gradeSelect = document.getElementById('grade-select');
+        const chapterSelect = document.getElementById('chapter-select');
+        const selectedGrade = gradeSelect.value;
+
+        chapterSelect.innerHTML = '<option value="">-- Choose Chapter --</option>';
+
+        if (selectedGrade && questionsDatabase[selectedGrade]) {
+            chapterSelect.disabled = false;
+            const chapters = questionsDatabase[selectedGrade];
+            
+            for (let chKey in chapters) {
+                let opt = document.createElement('option');
+                opt.value = chKey;
+                opt.textContent = chapters[chKey].name;
+                chapterSelect.appendChild(opt);
+            }
+        } else {
+            chapterSelect.disabled = true;
+            chapterSelect.innerHTML = '<option value="">-- First Choose Grade --</option>';
+        }
+    }
+
+    function startQuiz() {
+        const grade = document.getElementById('grade-select').value;
+        const chapter = document.getElementById('chapter-select').value;
+
+        if (!grade || !chapter) {
+            alert("Please select both Grade and Chapter!");
+            return;
+        }
+
+        currentQuestions = questionsDatabase[grade][chapter].questions;
+        currentQuestionIndex = 0;
+        score = 0;
+
+        document.getElementById('selection-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const quizContent = document.getElementById('quiz-content');
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.classList.add('hidden');
+
+        const q = currentQuestions[currentQuestionIndex];
+
+        let html = `
+            <div class="question-card">
+                <h3>Question ${currentQuestionIndex + 1} of ${currentQuestions.length}</h3>
+                <p style="margin-top: 10px; font-size: 1.1rem;">${q.question}</p>
+            </div>
+            <ul class="options">
+        `;
+
+        q.options.forEach((opt, idx) => {
+            html += `<li onclick="checkAnswer(${idx}, this)">${opt}</li>`;
+        });
+
+        html += `</ul>`;
+        quizContent.innerHTML = html;
+    }
+
+    function checkAnswer(selectedIdx, element) {
+        const q = currentQuestions[currentQuestionIndex];
+        const options = document.querySelectorAll('.options li');
+
+        // Disable all option clicks after selection
+        options.forEach(opt => opt.style.pointerEvents = 'none');
+
+        if (selectedIdx === q.answer) {
+            element.classList.add('correct');
+            score++;
+        } else {
+            element.classList.add('wrong');
+            options[q.answer].classList.add('correct');
+        }
+
+        document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuestions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        document.getElementById('final-score').innerText = `Your Score: ${score} / ${currentQuestions.length}`;
+    }
+
+    function restartQuiz() {
+        document.getElementById('result-screen').classList.add('hidden');
+        document.getElementById('selection-screen').classList.remove('hidden');
+        document.getElementById('grade-select').value = '';
+        updateChapters();
+    }
+</script>
+
+</body>
+</html>
